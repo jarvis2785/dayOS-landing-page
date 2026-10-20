@@ -24,7 +24,7 @@ export default function Navbar({ onCTAClick }: { onCTAClick: () => void }) {
       }`}
     >
       <div className="max-w-page mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
-        <span className="text-white font-extrabold text-xl tracking-tight font-display">
+        <span className="text-white font-black text-xl tracking-tight font-display">
           DayOS
         </span>
         <button

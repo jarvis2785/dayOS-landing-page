@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const professions = [
   "Student",
@@ -20,10 +22,10 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phone: "",
     profession: "",
     problem: "",
   });
+  const [phone, setPhone] = useState<string | undefined>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
@@ -34,7 +36,7 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
     if (!form.email.trim()) errs.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       errs.email = "Enter a valid email";
-    if (!form.phone.trim()) errs.phone = "Phone is required";
+    if (!phone) errs.phone = "Phone is required";
     if (!form.profession) errs.profession = "Select your profession";
     if (!form.problem.trim()) errs.problem = "This field is required";
     setErrors(errs);
@@ -51,7 +53,7 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, phone: phone || "" }),
       });
 
       if (!res.ok) {
@@ -66,12 +68,6 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
       setLoading(false);
     }
   };
-
-  const fields = [
-    { key: "name", label: "Full Name", type: "text", placeholder: "Your name" },
-    { key: "email", label: "Email", type: "email", placeholder: "your@email.com" },
-    { key: "phone", label: "Phone", type: "tel", placeholder: "+91 98765 43210" },
-  ];
 
   return (
     <motion.div
@@ -89,7 +85,7 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
           ← Back
         </button>
 
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3 font-display">
+        <h2 className="text-3xl sm:text-4xl font-black text-white mb-3 font-display">
           Get early access to DayOS
         </h2>
         <p className="text-text-secondary text-base mb-10">
@@ -98,32 +94,66 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
 
         <form onSubmit={handleSubmit} className="bg-surface rounded-[20px] p-6 sm:p-8 border border-border">
           <div className="flex flex-col gap-5">
-            {fields.map((field, i) => (
-              <motion.div
-                key={field.key}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-              >
-                <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted mb-2 block">
-                  {field.label}
-                </label>
-                <input
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  autoComplete="off"
-                  value={form[field.key as keyof typeof form]}
-                  onChange={(e) =>
-                    setForm({ ...form, [field.key]: e.target.value })
-                  }
-                  className="w-full bg-surface-hi border border-border rounded-2xl px-4 py-3.5 text-white text-sm placeholder:text-text-muted focus:border-accent-green focus:outline-none transition-colors"
-                />
-                {errors[field.key] && (
-                  <p className="text-accent-red text-xs mt-1.5">{errors[field.key]}</p>
-                )}
-              </motion.div>
-            ))}
+            {/* Name */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted mb-2 block">
+                Full Name
+              </label>
+              <input
+                type="text"
+                placeholder="Your name"
+                autoComplete="off"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full bg-surface-hi border border-border rounded-2xl px-4 py-3.5 text-white text-sm placeholder:text-text-muted focus:border-accent-green focus:outline-none transition-colors"
+              />
+              {errors.name && <p className="text-accent-red text-xs mt-1.5">{errors.name}</p>}
+            </motion.div>
 
+            {/* Email */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.05 }}
+            >
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted mb-2 block">
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="your@email.com"
+                autoComplete="off"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full bg-surface-hi border border-border rounded-2xl px-4 py-3.5 text-white text-sm placeholder:text-text-muted focus:border-accent-green focus:outline-none transition-colors"
+              />
+              {errors.email && <p className="text-accent-red text-xs mt-1.5">{errors.email}</p>}
+            </motion.div>
+
+            {/* Phone with country code */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              <label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted mb-2 block">
+                Phone
+              </label>
+              <PhoneInput
+                international
+                defaultCountry="IN"
+                value={phone}
+                onChange={setPhone}
+                placeholder="98765 43210"
+              />
+              {errors.phone && <p className="text-accent-red text-xs mt-1.5">{errors.phone}</p>}
+            </motion.div>
+
+            {/* Profession */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,11 +176,10 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
                   </option>
                 ))}
               </select>
-              {errors.profession && (
-                <p className="text-accent-red text-xs mt-1.5">{errors.profession}</p>
-              )}
+              {errors.profession && <p className="text-accent-red text-xs mt-1.5">{errors.profession}</p>}
             </motion.div>
 
+            {/* Problem */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -166,9 +195,7 @@ export default function WaitlistForm({ onBack, onSuccess }: WaitlistFormProps) {
                 onChange={(e) => setForm({ ...form, problem: e.target.value })}
                 className="w-full bg-surface-hi border border-border rounded-2xl px-4 py-3.5 text-white text-sm placeholder:text-text-muted focus:border-accent-green focus:outline-none transition-colors resize-none"
               />
-              {errors.problem && (
-                <p className="text-accent-red text-xs mt-1.5">{errors.problem}</p>
-              )}
+              {errors.problem && <p className="text-accent-red text-xs mt-1.5">{errors.problem}</p>}
             </motion.div>
           </div>
 

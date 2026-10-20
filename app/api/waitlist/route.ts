@@ -15,10 +15,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const now = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000;
-    const istDate = new Date(now.getTime() + istOffset);
-
     await notion.pages.create({
       parent: { database_id: databaseId },
       properties: {
@@ -36,9 +32,6 @@ export async function POST(req: NextRequest) {
         },
         "Biggest Problem holding them back": {
           rich_text: [{ text: { content: problem } }],
-        },
-        "Submitted At": {
-          date: { start: istDate.toISOString() },
         },
       },
     });
