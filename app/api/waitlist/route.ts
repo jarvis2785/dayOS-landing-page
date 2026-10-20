@@ -44,10 +44,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Notion API error:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Notion API error:", message, error);
     return NextResponse.json(
-      { error: "Failed to submit. Please try again." },
+      { error: message },
       { status: 500 }
     );
   }
