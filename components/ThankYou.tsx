@@ -81,7 +81,7 @@ export default function ThankYou({ email, onBack }: ThankYouProps) {
           transition={{ duration: 0.5, delay: 1.5 }}
           className="text-text-muted text-xs mt-12 leading-relaxed"
         >
-          DayOS — Built by a 20-year-old engineering student who got tired of
+          DayOS — Built by Shaan Soni, a 20yr/old founder who got tired of
           broken schedules.
         </motion.p>
 
